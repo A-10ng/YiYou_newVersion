@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:orientation="vertical"
+              android:background="#E4E4E4">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/titleBar"
+        android:textColor="@color/gray"
+        android:layout_marginBottom="15dp"
+        android:textSize="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/edit_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.65"
+            android:hint="@string/userName"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:background="@drawable/edit_register_bg"
+            android:layout_margin="15dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/edit_phoneNum"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.65"
+            android:hint="@string/phoneNum"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:background="@drawable/edit_register_bg"
+            android:layout_margin="15dp"
+            android:inputType="number"
+            android:maxLength="11"/>
+
+    </LinearLayout>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/male"
+            android:layout_marginRight="40dp"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radio_female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/female"
+            android:layout_marginLeft="40dp"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/edit_password"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.65"
+            android:hint="@string/password"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:background="@drawable/edit_register_bg"
+            android:layout_margin="15dp"
+            android:inputType="textPassword"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/edit_company"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.65"
+            android:hint="@string/company"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:background="@drawable/edit_register_bg"
+            android:layout_margin="15dp"/>
+
+    </LinearLayout>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_tourist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tourist"
+            android:layout_marginRight="40dp"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radio_guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/guide"
+            android:layout_marginLeft="40dp"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_upload_avatar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/avatar_upload"
+        android:layout_marginTop="15dp"/>
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_save"
+        android:layout_marginTop="13dp"/>
+
+    <TextView
+        android:id="@+id/click2login"
+        android:clickable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint"
+        android:textSize="10dp"
+        android:textColor="@color/red"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

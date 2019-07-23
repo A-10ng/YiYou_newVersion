@@ -32,7 +32,7 @@
     <string name="travelTime">旅游时间</string>
     <string name="teamIntro">队伍简介</string>
     <string name="btn_create">创建</string>
-    <string name="hints1">请长按此二维码，保存至手机，</string>
-    <string name="hints2">让学生根据队伍码进入您的队伍。</string>
+    <string name="hints1">点击二维码可查看大图，之后可长按此二维码，</string>
+    <string name="hints2">保存至手机，让学生根据队伍码进入您的队伍。</string>
     <string name="save_picture">保存图片</string>
 </resources>

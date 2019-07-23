@@ -2,6 +2,7 @@ package com.example.yiyou_newversion.ui;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -9,41 +10,39 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
-import android.support.design.widget.BottomNavigationView;
 
 import com.example.yiyou_newversion.R;
+import com.example.yiyou_newversion.fragment.GuideFunctionFragment;
+import com.example.yiyou_newversion.fragment.GuideHomeFragment;
 import com.example.yiyou_newversion.fragment.NoScrollViewPager;
 import com.example.yiyou_newversion.fragment.PersonalFragment;
-import com.example.yiyou_newversion.fragment.TourFunctionFragment;
-import com.example.yiyou_newversion.fragment.TourHomeFragment;
 import com.example.yiyou_newversion.model.Data;
 
 import java.util.ArrayList;
 
-public class TouristMainActivity extends AppCompatActivity {
+public class GuideMainActivity extends AppCompatActivity {
 
     //本次点击“返回键”的时刻
     private long mExitTime;
-
     private NoScrollViewPager mViewPager;
     private BottomNavigationView mBottomNavigationView;
-    private final Handler handler1 = new Handler();
+    private final Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_tourist);
+        setContentView(R.layout.activity_main_guide);
 
         mViewPager = findViewById(R.id.mViewPager);
         mViewPager.setNoScroll(true);
-        mBottomNavigationView = findViewById(R.id.mBottom);
+        mBottomNavigationView =  findViewById(R.id.mBottom);
         mBottomNavigationView.setItemIconTintList(null);
 
-        final Runnable mRunnable1 = new Runnable() {
+        final Runnable mRunnable = new Runnable() {
             @Override
             public void run() {
                 if (Data.CurrentTeamName == "none") {
-                    Toast.makeText(TouristMainActivity.this, "请先去<首页>选择一个队伍", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GuideMainActivity.this, "请先去<首页>选择一个队伍", Toast.LENGTH_SHORT).show();
                     mViewPager.setCurrentItem(0);
                 } else {
                     mViewPager.setCurrentItem(1);
@@ -62,7 +61,7 @@ public class TouristMainActivity extends AppCompatActivity {
                         Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                handler1.post(mRunnable1);
+                                handler.post(mRunnable);
                             }
                         });
                         thread.start();
@@ -93,21 +92,21 @@ public class TouristMainActivity extends AppCompatActivity {
         });
 
         //在ArrayList中装入底部导航栏的三个fragment
-        final ArrayList<Fragment> fragmentList1 = new ArrayList<>(3);
-        fragmentList1.add(new TourHomeFragment());//首页
-        fragmentList1.add(new TourFunctionFragment());//功能
-        fragmentList1.add(new PersonalFragment());//个人
+        final ArrayList<Fragment> fragmentList = new ArrayList<>(3);
+        fragmentList.add(new GuideHomeFragment());//首页
+        fragmentList.add(new GuideFunctionFragment());//功能
+        fragmentList.add(new PersonalFragment());//个人
 
         FragmentPagerAdapter mFragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
 
-                return fragmentList1.get(position);
+                return fragmentList.get(position);
             }
 
             @Override
             public int getCount() {
-                return fragmentList1.size();
+                return fragmentList.size();
             }
         };
 

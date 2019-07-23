@@ -6,10 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -80,7 +78,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 password = md5(edit_password.getText().toString().trim());
 
                 if (TextUtils.isEmpty(phoneNum) || TextUtils.isEmpty(password)){
+                    //隐藏进度条
                     progressBar.setVisibility(View.GONE);
+
                     Toast.makeText(this, "请输入手机号或密码！", Toast.LENGTH_SHORT).show();
                 }else {
                     new Thread(new Runnable() {
@@ -99,8 +99,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         Log.i(TAG, "run: loginSuccessful<tourist>");
 
                                         //将登录成功的用户的信息保留下来
-                                        Data.CurrenUerPhoneNum = user.getPhoneNum();
-                                        Data.CurrenUerUsername = user.getUsername();
+                                        Data.CurrenUserPhoneNum = user.getPhoneNum();
+                                        Data.CurrenUserUsername = user.getUsername();
 
                                         runOnUiThread(new Runnable() {
                                             @Override
@@ -115,8 +115,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         Log.i(TAG, "run: loginSuccessful<guide>");
 
                                         //将登录成功的用户的信息保留下来
-                                        Data.CurrenUerPhoneNum = user.getPhoneNum();
-                                        Data.CurrenUerUsername = user.getUsername();
+                                        Data.CurrenUserPhoneNum = user.getPhoneNum();
+                                        Data.CurrenUserUsername = user.getUsername();
 
                                         runOnUiThread(new Runnable() {
                                             @Override
@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             }
                                         });
 
-                                        startActivity(new Intent(LoginActivity.this,GuideActivity.class));
+                                        startActivity(new Intent(LoginActivity.this, GuideMainActivity.class));
                                         finish();
                                     }
                                 }else {

@@ -3,6 +3,7 @@
           package="com.example.yiyou_newversion">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +12,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.GuideActivity">
+        <activity android:name=".ui.TouristRouteActivity">
+        </activity>
+        <activity android:name=".ui.Tourist_TeamateActivity">
+        </activity>
+        <activity android:name=".ui.QuitTeamActivity">
+        </activity>
+        <activity android:name=".ui.GuideRouteActivity">
+        </activity>
+        <activity android:name=".ui.Guide_TeamateActivity">
+        </activity>
+        <activity android:name=".ui.FinishCrtTeamActivity">
+        </activity>
+        <activity android:name=".ui.CreateTeamActivity">
+        </activity>
+        <activity android:name=".ui.JoinTeamActivity">
+        </activity>
+        <activity android:name=".ui.GuideMainActivity">
         </activity>
         <activity android:name=".ui.RegisterActivity">
         </activity>

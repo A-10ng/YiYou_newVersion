@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:gravity="center_vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请输入队伍码来加入队伍"
+        android:textSize="22dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="15dip"/>
+
+    <EditText
+        android:id="@+id/edit_teamcode"
+        android:layout_width="250dip"
+        android:layout_height="35dip"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/edit_register_bg"
+        android:layout_marginBottom="15dip"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <Button
+            android:id="@+id/sure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确定"/>
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dip"
+            android:text="取消"/>
+    </LinearLayout>
+
+
+</LinearLayout>

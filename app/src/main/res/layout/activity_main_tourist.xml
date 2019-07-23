@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/mainActivityLinearlo"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.example.yiyou_newversion.fragment.NoScrollViewPager
+        android:id="@+id/mViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+    </com.example.yiyou_newversion.fragment.NoScrollViewPager>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dip"
+        android:background="#3399cc"/>
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/mBottom"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        app:menu="@menu/navigation"
+        app:itemTextColor="@drawable/btm_color_selector"
+        >
+    </android.support.design.widget.BottomNavigationView>
+</LinearLayout>

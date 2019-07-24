@@ -2,6 +2,7 @@ package com.example.yiyou_newversion.model;
 
 import android.util.Log;
 
+import com.example.yiyou_newversion.bean.Route;
 import com.example.yiyou_newversion.bean.Team;
 import com.example.yiyou_newversion.bean.User;
 import com.example.yiyou_newversion.utils.DBHelper;
@@ -25,19 +26,20 @@ public class Data {
     public static String CurrenUserUsername = "none";
     public static String CurrentTeamName = "none";
     public static String CurrentRoute = "none";
+    public static String CurrentGuidePhoneNum = "none";
 
-    public User getUserByPhoneNumInLogin(String phoneNum){
+    public User getUserByPhoneNumInLogin(String phoneNum) {
         User user = null;
-		Connection con = null;
-		PreparedStatement stat = null;
-		con = DBHelper.connect();
-		String sql = "select * from User where phoneNum=?";
+        Connection con = null;
+        PreparedStatement stat = null;
+        con = DBHelper.connect();
+        String sql = "select * from User where phoneNum=?";
 
         try {
             stat = con.prepareStatement(sql);
             stat.setString(1, phoneNum);
             ResultSet rs = stat.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 user = new User();
                 user.setUsername(rs.getString("username"));
                 user.setPhoneNum(rs.getString("phoneNum"));
@@ -46,7 +48,7 @@ public class Data {
                 user.setGender(rs.getInt("gender"));
                 user.setCompany(rs.getString("company"));
                 user.setAvatar(rs.getBytes("avatar"));
-            }else {
+            } else {
                 return null;
             }
         } catch (SQLException ex) {
@@ -58,7 +60,7 @@ public class Data {
         return user;
     }
 
-    public boolean hasThisPhoneNum(String phoneNum){
+    public boolean hasThisPhoneNum(String phoneNum) {
         boolean result = false;
         Connection con = null;
         PreparedStatement stat = null;
@@ -69,9 +71,9 @@ public class Data {
             stat = con.prepareStatement(sql);
             stat.setString(1, phoneNum);
             ResultSet rs = stat.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 result = true;
-            }else {
+            } else {
                 result = false;
             }
         } catch (SQLException ex) {
@@ -83,8 +85,8 @@ public class Data {
         return result;
     }
 
-    public boolean isRegisterSuccessful(String username,String password, String company,
-                                        int identity,int gender,byte[] avatar,String phoneNum){
+    public boolean isRegisterSuccessful(String username, String password, String company,
+                                        int identity, int gender, byte[] avatar, String phoneNum) {
         int rows = 0;
         Connection con = null;
         PreparedStatement stat = null;
@@ -99,25 +101,25 @@ public class Data {
             stat.setInt(3, gender);
             stat.setString(4, password);
             stat.setString(5, company);
-            stat.setInt(6,identity);
-            stat.setBytes(7,avatar);
+            stat.setInt(6, identity);
+            stat.setBytes(7, avatar);
             rows = stat.executeUpdate();
-            Log.i(TAG, "isRegisterSuccessful: befor rows>>>"+rows);
+            Log.i(TAG, "isRegisterSuccessful: befor rows>>>" + rows);
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
             DBHelper.closePreparedStatement(stat);
             DBHelper.closeConneciton(con);
         }
-        Log.i(TAG, "isRegisterSuccessful: after rows>>>"+rows);
-        if (rows == 1){
+        Log.i(TAG, "isRegisterSuccessful: after rows>>>" + rows);
+        if (rows == 1) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
-    public List<Team> getCurTeamsInTourist(){
+    public List<Team> getCurTeamsInTourist() {
         List<Team> list = new ArrayList<>();
         Connection con = null;
         PreparedStatement stat = null;
@@ -128,9 +130,10 @@ public class Data {
             stat = con.prepareStatement(sql);
             stat.setString(1, Data.CurrenUserPhoneNum);
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 Team team = new Team();
                 team.setTeamName(rs.getString("teamName"));
+                team.setGuidePhoneNum(rs.getString("guidePhoneNum"));
                 list.add(team);
             }
         } catch (SQLException ex) {
@@ -142,7 +145,7 @@ public class Data {
         return list;
     }
 
-    public List<Team> getCurTeamsInGuide(){
+    public List<Team> getCurTeamsInGuide() {
         List<Team> list = new ArrayList<>();
         Connection con = null;
         PreparedStatement stat = null;
@@ -154,7 +157,7 @@ public class Data {
             stat.setString(1, Data.CurrenUserPhoneNum);
             stat.setString(2, "0");
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 Team team = new Team();
                 team.setTeamName(rs.getString("teamName"));
                 list.add(team);
@@ -168,7 +171,7 @@ public class Data {
         return list;
     }
 
-    public List<Object> joinTeamByTeamCode(String teamCode){
+    public List<Object> joinTeamByTeamCode(String teamCode) {
         List<Object> list = new ArrayList<>();
         int rows = 0;
         Connection con = null;
@@ -180,28 +183,28 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql1);
-            stat.setString(1,teamCode);
+            stat.setString(1, teamCode);
             ResultSet rs = stat.executeQuery();
             //先根据队伍码判断有没有该队伍
-            if (rs.next()){
+            if (rs.next()) {
                 //有的话list的第一个元素就放true
                 list.add(true);
                 PreparedStatement stat2 = con.prepareStatement(sql2);
-                stat2.setString(1,rs.getString("guidePhoneNum"));
-                stat2.setString(2,rs.getString("travelDate"));
-                stat2.setString(3,rs.getString("teamName"));
-                stat2.setString(4,rs.getString("teamIntro"));
-                stat2.setString(5,Data.CurrenUserPhoneNum);
-                stat2.setString(6,rs.getString("teamCode"));
-                stat2.setBytes(7,rs.getBytes("qrCode"));
+                stat2.setString(1, rs.getString("guidePhoneNum"));
+                stat2.setString(2, rs.getString("travelDate"));
+                stat2.setString(3, rs.getString("teamName"));
+                stat2.setString(4, rs.getString("teamIntro"));
+                stat2.setString(5, Data.CurrenUserPhoneNum);
+                stat2.setString(6, rs.getString("teamCode"));
+                stat2.setBytes(7, rs.getBytes("qrCode"));
                 rows = stat2.executeUpdate();
                 //如果加入队伍成功就将list的第二个元素放1，否则为0
-                if (rows == 1){
+                if (rows == 1) {
                     list.add(1);
-                }else {
+                } else {
                     list.add(0);
                 }
-            }else {
+            } else {
                 list.add(false);
             }
         } catch (SQLException ex) {
@@ -222,9 +225,9 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql);
-            stat.setString(1,teamCode);
+            stat.setString(1, teamCode);
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 Team team = new Team();
                 team.setTeamCode(rs.getString("teamCode"));
                 list.add(team);
@@ -249,13 +252,13 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql);
-            stat.setString(1,Data.CurrenUserPhoneNum);
-            stat.setString(2,teamName);
-            stat.setString(3,travelDate);
-            stat.setString(4,teamIntro);
-            stat.setString(5,teamCode);
-            stat.setString(6,teamatePhoneNum);
-            stat.setBytes(7,qrCode);
+            stat.setString(1, Data.CurrenUserPhoneNum);
+            stat.setString(2, teamName);
+            stat.setString(3, travelDate);
+            stat.setString(4, teamIntro);
+            stat.setString(5, teamCode);
+            stat.setString(6, teamatePhoneNum);
+            stat.setBytes(7, qrCode);
             result = stat.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -263,9 +266,9 @@ public class Data {
             DBHelper.closePreparedStatement(stat);
             DBHelper.closeConneciton(con);
         }
-        if (result == 1){
+        if (result == 1) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -280,9 +283,9 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql);
-            stat.setString(1,Data.CurrenUserPhoneNum);
+            stat.setString(1, Data.CurrenUserPhoneNum);
             ResultSet rs = stat.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 user = new User();
                 user.setUsername(rs.getString("username"));
             }
@@ -301,15 +304,15 @@ public class Data {
 
         try {
             statement = connection.prepareStatement(sql);
-            statement.setString(1,teamIntro);
-            statement.setString(2,Data.CurrentTeamName);
+            statement.setString(1, teamIntro);
+            statement.setString(2, Data.CurrentTeamName);
             result = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if (result == 1){
+        if (result == 1) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -322,9 +325,9 @@ public class Data {
 
         try {
             statement = connection.prepareStatement(sql);
-            statement.setString(1,Data.CurrentTeamName);
+            statement.setString(1, Data.CurrentTeamName);
             ResultSet rs = statement.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 team = new Team();
                 team.setTeamIntro(rs.getString("teamIntro"));
                 team.setTravelDate(rs.getString("travelDate"));
@@ -343,9 +346,9 @@ public class Data {
 
         try {
             statement = connection.prepareStatement(sql);
-            statement.setString(1,Data.CurrenUserPhoneNum);
+            statement.setString(1, Data.CurrenUserPhoneNum);
             ResultSet rs = statement.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 user = new User();
                 user.setUsername(rs.getString("username"));
                 user.setAvatar(rs.getBytes("avatar"));
@@ -368,24 +371,24 @@ public class Data {
 
         try {
             statement = connection.prepareStatement(sql1);
-            statement.setString(1,Data.CurrentTeamName);
+            statement.setString(1, Data.CurrentTeamName);
             ResultSet rs = statement.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 team = new Team();
                 team.setGuidePhoneNum(rs.getString("guidePhoneNum"));
                 team.setTravelDate(rs.getString("travelDate"));
                 team.setTeamIntro(rs.getString("teamIntro"));
                 list.add(team);
                 PreparedStatement statement1 = connection.prepareStatement(sql2);
-                statement1.setString(1,team.getGuidePhoneNum());
+                statement1.setString(1, team.getGuidePhoneNum());
                 ResultSet resultSet = statement1.executeQuery();
-                if (resultSet.next()){
+                if (resultSet.next()) {
                     user = new User();
                     user.setUsername(resultSet.getString("username"));
                     user.setAvatar(resultSet.getBytes("avatar"));
                     list.add(user);
                 }
-            }else {
+            } else {
                 list.add(null);
                 list.add(null);
             }
@@ -404,10 +407,10 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql);
-            stat.setString(1,Data.CurrentTeamName);
-            stat.setString(2,"0");
+            stat.setString(1, Data.CurrentTeamName);
+            stat.setString(2, "0");
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 Team team = new Team();
                 team.setTeamatePhoneNum(rs.getString("teamatePhoneNum"));
                 list.add(team);
@@ -430,10 +433,10 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql);
-            stat.setString(1,Data.CurrentTeamName);
-            stat.setString(2,"0");
+            stat.setString(1, Data.CurrentTeamName);
+            stat.setString(2, "0");
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 Team team = new Team();
                 team.setTeamCode(rs.getString("teamCode"));
                 team.setQrCode(rs.getBytes("qrCode"));
@@ -459,9 +462,9 @@ public class Data {
 
         try {
             stat = con.prepareStatement(sql);
-            stat.setString(1,teams.get(0).getTeamatePhoneNum());
+            stat.setString(1, teams.get(0).getTeamatePhoneNum());
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 user = new User();
                 user.setUsername(rs.getString("username"));
                 user.setPhoneNum(rs.getString("phoneNum"));
@@ -482,7 +485,7 @@ public class Data {
 
         try {
             statement = connection.prepareStatement(sql);
-            statement.setString(1,Data.CurrentTeamName);
+            statement.setString(1, Data.CurrentTeamName);
             result = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -502,8 +505,8 @@ public class Data {
 
         try {
             statement = connection.prepareStatement(sql);
-            statement.setString(1,Data.CurrenUserPhoneNum);
-            statement.setString(2,Data.CurrentTeamName);
+            statement.setString(1, Data.CurrenUserPhoneNum);
+            statement.setString(2, Data.CurrentTeamName);
             result = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -512,5 +515,99 @@ public class Data {
             return true;
         else
             return false;
+    }
+
+    public List<Route> getRoutes() {
+        List<Route> routes = new ArrayList<>();
+        Route route = null;
+        Connection conn = null;
+        PreparedStatement stat = null;
+        conn = DBHelper.connect();
+        String sql = "select * from Route where guidePhoneNum=? and teamName=? and route!=?";
+
+        try {
+            stat = conn.prepareStatement(sql);
+            stat.setString(1, Data.CurrentGuidePhoneNum);
+            stat.setString(2, Data.CurrentTeamName);
+            stat.setString(3, "none");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()) {
+                route = new Route();
+                route.setRoute(rs.getString("route"));
+                routes.add(route);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return routes;
+    }
+
+    public Route getCurrentRoutes() {
+        Route route = null;
+        Connection conn = null;
+        PreparedStatement stat = null;
+        conn = DBHelper.connect();
+        String sql = "select * from Route where guidePhoneNum=? and teamName=?";
+
+        try {
+            stat = conn.prepareStatement(sql);
+            stat.setString(1, Data.CurrenUserPhoneNum);
+            stat.setString(2, Data.CurrentTeamName);
+            ResultSet rs = stat.executeQuery();
+            if (rs.next()) {
+                route = new Route();
+                route.setRoute(rs.getString("route"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return route;
+    }
+
+    public boolean crtRouteSuccessful() {
+        int res = 0;
+        Connection conn = null;
+        PreparedStatement stat = null;
+        conn = DBHelper.connect();
+        String sql = "insert into Route (guidePhoneNum,teamName,route) " +
+                "values(?,?,?)";
+
+        try {
+            stat = conn.prepareStatement(sql);
+            stat.setString(1, Data.CurrenUserPhoneNum);
+            stat.setString(2, Data.CurrentTeamName);
+            stat.setString(3, Data.CurrentRoute);
+            res = stat.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (res == 1){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public boolean updateRouteSuccessful() {
+        int res = 0;
+        Connection conn = null;
+        PreparedStatement stat = null;
+        conn = DBHelper.connect();
+        String sql = "update Route set route = ? where guidePhoneNum = ? and teamName = ? ";
+
+        try {
+            stat = conn.prepareStatement(sql);
+            stat.setString(1, Data.CurrentRoute);
+            stat.setString(2, Data.CurrenUserPhoneNum);
+            stat.setString(3, Data.CurrentTeamName);
+            res = stat.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (res == 1){
+            return true;
+        }else {
+            return false;
+        }
     }
 }

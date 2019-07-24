@@ -69,6 +69,7 @@ public class TourHomeFragment extends Fragment{
                                         //将当前选择的队伍作为功能界面的队伍
                                         int i = (Integer) v.getTag();
                                         Data.CurrentTeamName = teams.get(i).getTeamName();
+                                        Data.CurrentGuidePhoneNum = teams.get(i).getGuidePhoneNum();
 
                                         //更新功能页面的信息
                                         TouristMainActivity activity = (TouristMainActivity) getActivity();
@@ -91,6 +92,7 @@ public class TourHomeFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Data.CurrentTeamName = "none";
+                Data.CurrentGuidePhoneNum = "none";
                 Intent intent = new Intent(getActivity(), JoinTeamActivity.class);
                 startActivity(intent);
             }

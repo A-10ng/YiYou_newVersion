@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.yiyou_newversion.R;
 import com.example.yiyou_newversion.bean.Team;
@@ -33,12 +35,24 @@ import static com.example.yiyou_newversion.utils.Utils.byte2bitmap;
 
 public class TourFunctionFragment extends Fragment {
 
+    private final static int CHECK_TEAMINTRO = 0;
+    private final static int UPDATE_UI = 1;
     private View view;
     private Data data = new Data();
-    private Handler handler = new Handler(){
+    /**
+     * 上方显示区域模块
+     */
+    private TextView click2check;
+    private TextView tv_TeamName;
+    private TextView tv_travelDate;
+    private TextView tv_teamIntro;
+    private TextView tv_guideName;
+    private ImageView iv_guideAvatar;
+    private List<Object> list = new ArrayList<>();
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case CHECK_TEAMINTRO:
                     String Intro = (String) msg.obj;
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
@@ -60,7 +74,7 @@ public class TourFunctionFragment extends Fragment {
                     User CurrentGuide = (User) list.get(1);
 
                     String travelDate = CurrentTeam.getTravelDate();
-                    String Info= CurrentTeam.getTeamIntro();
+                    String Info = CurrentTeam.getTeamIntro();
                     String guideName = CurrentGuide.getUsername();
 
                     if (travelDate == null || travelDate.equals("")) {
@@ -81,20 +95,6 @@ public class TourFunctionFragment extends Fragment {
             }
         }
     };
-
-    /**
-     * 上方显示区域模块
-     */
-    private TextView click2check;
-    private TextView tv_TeamName;
-    private TextView tv_travelDate;
-    private TextView tv_teamIntro;
-    private TextView tv_guideName;
-    private ImageView iv_guideAvatar;
-    private final static int CHECK_TEAMINTRO = 0;
-    private final static int UPDATE_UI = 1;
-    private List<Object> list = new ArrayList<>();
-
     /**
      * 功能区域模块
      */
@@ -104,7 +104,7 @@ public class TourFunctionFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_stufunction,container,false);
+        view = inflater.inflate(R.layout.fragment_stufunction, container, false);
 
         /**
          * 上方显示区域模块初始化
@@ -129,13 +129,19 @@ public class TourFunctionFragment extends Fragment {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Team CurrentTeam = data.getCurrentTeamInGuideFun();
+                        Looper.prepare();
+                        try {
+                            Team CurrentTeam = data.getCurrentTeamInGuideFun();
 
-                        Message msg = Message.obtain();
-                        String intro = CurrentTeam.getTeamIntro();
-                        msg.obj = intro;
-                        msg.what = CHECK_TEAMINTRO;
-                        handler.sendMessage(msg);
+                            Message msg = Message.obtain();
+                            String intro = CurrentTeam.getTeamIntro();
+                            msg.obj = intro;
+                            msg.what = CHECK_TEAMINTRO;
+                            handler.sendMessage(msg);
+                        } catch (Exception e) {
+                            Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                        }
+                        Looper.loop();
                     }
                 });
                 thread.start();
@@ -168,13 +174,19 @@ public class TourFunctionFragment extends Fragment {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //第一个元素是Team类型的CurrentTeam
-                //第二个元素是User类型的CurrentUser
-                list = data.getCurTeamAndGuideInTourFun();
+                Looper.prepare();
+                try {
+                    //第一个元素是Team类型的CurrentTeam
+                    //第二个元素是User类型的CurrentUser
+                    list = data.getCurTeamAndGuideInTourFun();
 
-                Message msg = Message.obtain();
-                msg.what = UPDATE_UI;
-                handler.sendMessage(msg);
+                    Message msg = Message.obtain();
+                    msg.what = UPDATE_UI;
+                    handler.sendMessage(msg);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                }
+                Looper.loop();
             }
         });
         thread.start();

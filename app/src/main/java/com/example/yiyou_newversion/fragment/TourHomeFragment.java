@@ -3,6 +3,7 @@ package com.example.yiyou_newversion.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.yiyou_newversion.R;
 import com.example.yiyou_newversion.bean.Team;
@@ -25,7 +27,7 @@ import java.util.List;
  * Created by 龙世治 on 2019/3/23.
  */
 
-public class TourHomeFragment extends Fragment{
+public class TourHomeFragment extends Fragment {
 
     private final static int DISPLAY_TEAM = 0;
     private View view;
@@ -38,18 +40,23 @@ public class TourHomeFragment extends Fragment{
 
     private Handler handler;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_stuhome,container,false);
+        view = inflater.inflate(R.layout.fragment_stuhome, container, false);
 
-        handler = new Handler(){
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                switch (msg.what){
+                switch (msg.what) {
                     case DISPLAY_TEAM:
                         //如果用户已加入过队伍，则动态新增按钮
-                        if (teams.size() != 0){
+                        if (teams.size() != 0) {
                             Button btn[] = new Button[teams.size()];
                             for (int i = 0; i < teams.size(); i++) {
                                 btn[i] = new Button(getActivity());
@@ -74,8 +81,8 @@ public class TourHomeFragment extends Fragment{
                                         //更新功能页面的信息
                                         TouristMainActivity activity = (TouristMainActivity) getActivity();
                                         NoScrollViewPager viewPager = activity.findViewById(R.id.mViewPager);
-                                        TourFunctionFragment tourFunctionFragment = (TourFunctionFragment)getActivity().getSupportFragmentManager()
-                                                .findFragmentByTag("android:switcher:"+R.id.mViewPager+":1");
+                                        TourFunctionFragment tourFunctionFragment = (TourFunctionFragment) getActivity().getSupportFragmentManager()
+                                                .findFragmentByTag("android:switcher:" + R.id.mViewPager + ":1");
                                         tourFunctionFragment.updateUI();
                                         viewPager.setCurrentItem(1);
                                     }
@@ -102,18 +109,19 @@ public class TourHomeFragment extends Fragment{
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //获取当前用户所加入的队伍
-                teams = data.getCurTeamsInTourist();
+                Looper.prepare();
+                try {
+                    //获取当前用户所加入的队伍
+                    teams = data.getCurTeamsInTourist();
 
-                //转至主线程更新UI
-                handler.sendEmptyMessage(DISPLAY_TEAM);
+                    //转至主线程更新UI
+                    handler.sendEmptyMessage(DISPLAY_TEAM);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                }
+                Looper.loop();
             }
         }).start();
         return view;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 }

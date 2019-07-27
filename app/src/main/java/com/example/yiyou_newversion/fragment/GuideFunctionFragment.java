@@ -25,6 +25,7 @@ import com.example.yiyou_newversion.bean.User;
 import com.example.yiyou_newversion.model.Data;
 import com.example.yiyou_newversion.ui.GuideRouteActivity;
 import com.example.yiyou_newversion.ui.Guide_TeamateActivity;
+import com.example.yiyou_newversion.ui.RegisterActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,19 +39,42 @@ import static com.example.yiyou_newversion.utils.Utils.byte2bitmap;
 
 public class GuideFunctionFragment extends Fragment {
 
+    private final static int UPDATE_TEAMINTRO_SUCCESSFUL = 0;
+    private final static int UPDATE_TEAMINTRO_FAIL = 1;
+    private final static int CHECK_TEAMINTRO = 2;
+    private final static int UPDATE_UI = 3;
     private View view;
     private Data data = new Data();
-    private Handler handler = new Handler(){
+    /**
+     * 上方显示区域模块
+     */
+    //点击编辑队伍简介
+    private TextView click2edit;
+    //点击查看队伍简介
+    private TextView click2check;
+    //显示队伍简介
+    private TextView tv_teamIntro;
+    //显示队伍名称
+    private TextView tv_TeamName;
+    //显示队伍旅游时间
+    private TextView tv_travelDate;
+    //显示队伍导游名称
+    private TextView tv_guideName;
+    //显示导游头像
+    private ImageView iv_guideAvatar;
+    //当前队伍和导游
+    private List<Object> CurrentList = new ArrayList<>();
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case UPDATE_TEAMINTRO_SUCCESSFUL:
                     String teamIntro = (String) msg.obj;
                     tv_teamIntro.setText(teamIntro);
                     break;
                 case UPDATE_TEAMINTRO_FAIL:
                     Toast toast = Toast.makeText(getContext(), "更新失败！", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER,0,0);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                     break;
                 case CHECK_TEAMINTRO:
@@ -74,7 +98,7 @@ public class GuideFunctionFragment extends Fragment {
                     Team CurrentTeam = (Team) CurrentList.get(1);
 
                     String travelDate = CurrentTeam.getTravelDate();
-                    String Info= CurrentTeam.getTeamIntro();
+                    String Info = CurrentTeam.getTeamIntro();
                     String guideName = CurrentGuide.getUsername();
 
                     if (travelDate == null || travelDate.equals("")) {
@@ -95,31 +119,6 @@ public class GuideFunctionFragment extends Fragment {
             }
         }
     };
-
-    /**
-     * 上方显示区域模块
-     */
-    //点击编辑队伍简介
-    private TextView click2edit;
-    //点击查看队伍简介
-    private TextView click2check;
-    //显示队伍简介
-    private TextView tv_teamIntro;
-    //显示队伍名称
-    private TextView tv_TeamName;
-    //显示队伍旅游时间
-    private TextView tv_travelDate;
-    //显示队伍导游名称
-    private TextView tv_guideName;
-    //显示导游头像
-    private ImageView iv_guideAvatar;
-    private final static int UPDATE_TEAMINTRO_SUCCESSFUL = 0;
-    private final static int UPDATE_TEAMINTRO_FAIL = 1;
-    private final static int CHECK_TEAMINTRO = 2;
-    private final static int UPDATE_UI = 3;
-    //当前队伍和导游
-    private List<Object> CurrentList = new ArrayList<>();
-
     /**
      * 功能区域模块
      */
@@ -127,6 +126,11 @@ public class GuideFunctionFragment extends Fragment {
     private ImageView fun_teamate;
     //旅游行踪功能
     private ImageView fun_guide_route;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -187,20 +191,24 @@ public class GuideFunctionFragment extends Fragment {
                             @Override
                             public void run() {
                                 Looper.prepare();
-                                String teamIntro = editText_teamIntro.getText().toString();
-                                if (TextUtils.isEmpty(teamIntro)){
-                                    Toast toast = Toast.makeText(getContext(), "请输入相关内容", Toast.LENGTH_SHORT);
-                                    toast.setGravity(Gravity.CENTER,0,0);
-                                    toast.show();
-                                }else {
-                                    if (data.isUpdateTeamIntroSuccessful(teamIntro)){
-                                        Message msg = Message.obtain();
-                                        msg.obj = teamIntro;
-                                        msg.what = UPDATE_TEAMINTRO_SUCCESSFUL;
-                                        handler.sendMessage(msg);
-                                    }else {
-                                        handler.sendEmptyMessage(UPDATE_TEAMINTRO_FAIL);
+                                try {
+                                    String teamIntro = editText_teamIntro.getText().toString();
+                                    if (TextUtils.isEmpty(teamIntro)) {
+                                        Toast toast = Toast.makeText(getContext(), "请输入相关内容", Toast.LENGTH_SHORT);
+                                        toast.setGravity(Gravity.CENTER, 0, 0);
+                                        toast.show();
+                                    } else {
+                                        if (data.isUpdateTeamIntroSuccessful(teamIntro)) {
+                                            Message msg = Message.obtain();
+                                            msg.obj = teamIntro;
+                                            msg.what = UPDATE_TEAMINTRO_SUCCESSFUL;
+                                            handler.sendMessage(msg);
+                                        } else {
+                                            handler.sendEmptyMessage(UPDATE_TEAMINTRO_FAIL);
+                                        }
                                     }
+                                } catch (Exception e) {
+                                    Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                                 }
                                 Looper.loop();
                             }
@@ -220,13 +228,19 @@ public class GuideFunctionFragment extends Fragment {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Team CurrentTeam = data.getCurrentTeamInGuideFun();
+                        Looper.prepare();
+                        try {
+                            Team CurrentTeam = data.getCurrentTeamInGuideFun();
 
-                        Message msg = Message.obtain();
-                        String intro = CurrentTeam.getTeamIntro();
-                        msg.obj = intro;
-                        msg.what = CHECK_TEAMINTRO;
-                        handler.sendMessage(msg);
+                            Message msg = Message.obtain();
+                            String intro = CurrentTeam.getTeamIntro();
+                            msg.obj = intro;
+                            msg.what = CHECK_TEAMINTRO;
+                            handler.sendMessage(msg);
+                        } catch (Exception e) {
+                            Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                        }
+                        Looper.loop();
                     }
                 });
                 thread.start();
@@ -235,27 +249,28 @@ public class GuideFunctionFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     //更新导游头像，导游名称，队伍名称，旅游时间，队伍简介
     public void updateUI() {
         tv_TeamName.setText(Data.CurrentTeamName);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //获取当前的导游和队伍
-                User CurrentGuide = data.getCurGuideInGuideFun();
-                Team CurrentTeam = data.getCurrentTeamInGuideFun();
-                CurrentList.clear();
-                CurrentList.add(CurrentGuide);
-                CurrentList.add(CurrentTeam);
+                Looper.prepare();
+                try {
+                    //获取当前的导游和队伍
+                    User CurrentGuide = data.getCurGuideInGuideFun();
+                    Team CurrentTeam = data.getCurrentTeamInGuideFun();
+                    CurrentList.clear();
+                    CurrentList.add(CurrentGuide);
+                    CurrentList.add(CurrentTeam);
 
-                Message msg = Message.obtain();
-                msg.what = UPDATE_UI;
-                handler.sendMessage(msg);
+                    Message msg = Message.obtain();
+                    msg.what = UPDATE_UI;
+                    handler.sendMessage(msg);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                }
+                Looper.loop();
             }
         });
         thread.start();

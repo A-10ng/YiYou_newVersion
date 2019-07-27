@@ -1,12 +1,14 @@
 package com.example.yiyou_newversion.ui;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.yiyou_newversion.R;
 import com.example.yiyou_newversion.bean.Route;
@@ -16,13 +18,13 @@ import java.util.List;
 
 public class TouristRouteActivity extends AppCompatActivity {
 
+    private static final int HAS_NO_ROUTE = 0;
+    private static final int HAS_SOME_ROUTES = 1;
     private Data data = new Data();
     private LinearLayout linearLayout;
     //当前的路线
     private List<Route> routes;
     private Handler handler;
-    private static final int HAS_NO_ROUTE = 0;
-    private static final int HAS_SOME_ROUTES = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +69,11 @@ public class TouristRouteActivity extends AppCompatActivity {
         };
 
 
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                try {
                     routes = data.getRoutes();
 
                     //如果当前导游还没发布行程信息
@@ -78,9 +82,13 @@ public class TouristRouteActivity extends AppCompatActivity {
                     } else {
                         handler.sendEmptyMessage(HAS_SOME_ROUTES);
                     }
+                } catch (Exception e) {
+                    Toast.makeText(TouristRouteActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                 }
-            });
-            thread.start();
+                Looper.loop();
+            }
+        });
+        thread.start();
     }
 
     private void findAllViews() {

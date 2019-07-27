@@ -34,39 +34,43 @@ public class QuitTeamActivity extends AppCompatActivity {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final boolean result = data.QuitThisTeam();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (result == true){
-                                    Toast.makeText(QuitTeamActivity.this,"退队成功！",Toast.LENGTH_SHORT).show();
-                                    Data.CurrentTeamName = "none";
-                                    final Intent intent2 = new Intent(QuitTeamActivity.this, TouristMainActivity.class);
-                                    Timer timer = new Timer();
-                                    TimerTask ts = new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            startActivity(intent2);
-                                            finish();
-                                        }
-                                    };
-                                    timer.schedule(ts,1000);
-                                }else {
-                                    Toast.makeText(QuitTeamActivity.this,"退队失败，发生未知错误！",Toast.LENGTH_SHORT).show();
-                                    final Intent intent2 = new Intent(QuitTeamActivity.this, TouristMainActivity.class);
-                                    Timer timer = new Timer();
-                                    TimerTask ts = new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            startActivity(intent2);
-                                            finish();
-                                        }
-                                    };
-                                    timer.schedule(ts,1000);
+                        try {
+                            final boolean result = data.QuitThisTeam();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (result == true) {
+                                        Toast.makeText(QuitTeamActivity.this, "退队成功！", Toast.LENGTH_SHORT).show();
+                                        Data.CurrentTeamName = "none";
+                                        Data.CurrentGuidePhoneNum = "none";
+                                        final Intent intent2 = new Intent(QuitTeamActivity.this, TouristMainActivity.class);
+                                        Timer timer = new Timer();
+                                        TimerTask ts = new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                startActivity(intent2);
+                                                finish();
+                                            }
+                                        };
+                                        timer.schedule(ts, 1000);
+                                    } else {
+                                        Toast.makeText(QuitTeamActivity.this, "退队失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                        final Intent intent2 = new Intent(QuitTeamActivity.this, TouristMainActivity.class);
+                                        Timer timer = new Timer();
+                                        TimerTask ts = new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                startActivity(intent2);
+                                                finish();
+                                            }
+                                        };
+                                        timer.schedule(ts, 1000);
+                                    }
                                 }
-                            }
-                        });
-
+                            });
+                        } catch (Exception e) {
+                            Toast.makeText(QuitTeamActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 thread.start();
@@ -77,7 +81,7 @@ public class QuitTeamActivity extends AppCompatActivity {
         btn_hesitate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(QuitTeamActivity.this,Tourist_TeamateActivity.class);
+                Intent intent = new Intent(QuitTeamActivity.this, Tourist_TeamateActivity.class);
                 startActivity(intent);
                 finish();
             }

@@ -81,7 +81,7 @@ public class GuideRouteActivity extends AppCompatActivity {
                     tv_route.setText(str_route.toString());
                     break;
                 case UPDATE_ROUTES:
-                    Log.i(TAG, "CurrentRoute: "+Data.CurrentRoute);
+                    Log.i(TAG, "CurrentRoute: " + Data.CurrentRoute);
 
                     //分割字符串，显示路线
                     String[] num1 = Data.CurrentRoute.split("_");
@@ -105,18 +105,24 @@ public class GuideRouteActivity extends AppCompatActivity {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //获取当前队伍的旅游路线，用于显示出来
-                Route CurrentRoutes = data.getCurrentRoutes();
+                Looper.prepare();
+                try {
+                    //获取当前队伍的旅游路线，用于显示出来
+                    Route CurrentRoutes = data.getCurrentRoutes();
 
-                if (CurrentRoutes == null) {
-                    handler.sendEmptyMessage(HAS_NO_ROUTES);
-                } else {
-                    Message message = Message.obtain();
-                    message.obj = CurrentRoutes;
-                    message.what = HAS_SOME_ROUTES;
+                    if (CurrentRoutes == null) {
+                        handler.sendEmptyMessage(HAS_NO_ROUTES);
+                    } else {
+                        Message message = Message.obtain();
+                        message.obj = CurrentRoutes;
+                        message.what = HAS_SOME_ROUTES;
 
-                    handler.sendMessage(message);
+                        handler.sendMessage(message);
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(GuideRouteActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                 }
+                Looper.loop();
             }
         });
         thread.start();
@@ -150,64 +156,64 @@ public class GuideRouteActivity extends AppCompatActivity {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        String content = "";
-                        Data.CurrentRoute = "none";
+                        Looper.prepare();
+                        try {
+                            String content = "";
+                            Data.CurrentRoute = "none";
 
-                        //检查输入框的内容是否为空，是则提示
-                        for (int i = 0; i < listEditText.size(); i++) {
-                            if (listEditText.get(i).getText().toString() == null ||
-                                    listEditText.get(i).getText().toString().equals("")) {
-                                Looper.prepare();
-                                Toast.makeText(GuideRouteActivity.this, "请填好相关行程！", Toast.LENGTH_SHORT).show();
-                                Looper.loop();
-                                break;
-                            } else {
-                                content += listEditText.get(i).getText().toString() + "_";
-                                Data.CurrentRoute = content;
-                            }
-                        }
-
-                        //如果当前用户已写好路线
-                        if (!Data.CurrentRoute.equals("none")) {
-                            String[] contens = Data.CurrentRoute.split("_");
-                            //用户填的信息符合要求（eg:有三个框，只填了前两个，则只会提示，不会创建路线）
-                            if (contens.length == listEditText.size()) {
-                                //当前还没有行程，则新建行程
-                                if (tv_route.getText().toString().trim().equals("暂无行程信息！") ||
-                                        tv_route.getText().toString().trim() == "暂无行程信息！"){
-                                    boolean crtRouteSuccessful = data.crtRouteSuccessful();
-                                    //新建行程成功
-                                    Looper.prepare();
-                                    if (crtRouteSuccessful == true){
-                                        Toast.makeText(GuideRouteActivity.this, "新建成功！", Toast.LENGTH_SHORT).show();
-                                        handler.sendEmptyMessage(UPDATE_ROUTES);
-                                    }
-                                    //新建行程失败
-                                    else {
-                                        Log.i(TAG, "run: crtRouteFail!");
-                                        Toast.makeText(GuideRouteActivity.this, "新建失败，发生未知错误！", Toast.LENGTH_SHORT).show();
-                                    }
-                                    Looper.loop();
-                                }
-                                //当前已存在行程，则更新行程
-                                else {
-                                    boolean updateRouteSuccessful = data.updateRouteSuccessful();
-
-                                    Looper.prepare();
-                                    //更新行程成功
-                                    if (updateRouteSuccessful == true){
-                                        Toast.makeText(GuideRouteActivity.this, "更新成功！", Toast.LENGTH_SHORT).show();
-                                        handler.sendEmptyMessage(UPDATE_ROUTES);
-                                    }
-                                    //更新行程失败
-                                    else {
-                                        Log.i(TAG, "run: ");
-                                        Toast.makeText(GuideRouteActivity.this, "更新失败，发生未知错误！", Toast.LENGTH_SHORT).show();
-                                    }
-                                    Looper.loop();
+                            //检查输入框的内容是否为空，是则提示
+                            for (int i = 0; i < listEditText.size(); i++) {
+                                if (listEditText.get(i).getText().toString() == null ||
+                                        listEditText.get(i).getText().toString().equals("")) {
+                                    Toast.makeText(GuideRouteActivity.this, "请填好相关行程！", Toast.LENGTH_SHORT).show();
+                                    break;
+                                } else {
+                                    content += listEditText.get(i).getText().toString() + "_";
+                                    Data.CurrentRoute = content;
                                 }
                             }
+
+                            //如果当前用户已写好路线
+                            if (!Data.CurrentRoute.equals("none")) {
+                                String[] contens = Data.CurrentRoute.split("_");
+                                //用户填的信息符合要求（eg:有三个框，只填了前两个，则只会提示，不会创建路线）
+                                if (contens.length == listEditText.size()) {
+                                    //当前还没有行程，则新建行程
+                                    if (tv_route.getText().toString().trim().equals("暂无行程信息！") ||
+                                            tv_route.getText().toString().trim() == "暂无行程信息！") {
+                                        boolean crtRouteSuccessful = data.crtRouteSuccessful();
+                                        //新建行程成功
+                                        if (crtRouteSuccessful == true) {
+                                            Toast.makeText(GuideRouteActivity.this, "新建成功！", Toast.LENGTH_SHORT).show();
+                                            handler.sendEmptyMessage(UPDATE_ROUTES);
+                                        }
+                                        //新建行程失败
+                                        else {
+                                            Log.i(TAG, "run: crtRouteFail!");
+                                            Toast.makeText(GuideRouteActivity.this, "新建失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    //当前已存在行程，则更新行程
+                                    else {
+                                        boolean updateRouteSuccessful = data.updateRouteSuccessful();
+
+                                        //更新行程成功
+                                        if (updateRouteSuccessful == true) {
+                                            Toast.makeText(GuideRouteActivity.this, "更新成功！", Toast.LENGTH_SHORT).show();
+                                            handler.sendEmptyMessage(UPDATE_ROUTES);
+                                        }
+                                        //更新行程失败
+                                        else {
+                                            Log.i(TAG, "run: ");
+                                            Toast.makeText(GuideRouteActivity.this, "更新失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(GuideRouteActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                         }
+                        Looper.loop();
                     }
                 });
                 thread.start();
@@ -260,7 +266,7 @@ public class GuideRouteActivity extends AppCompatActivity {
             //创建内部edittext控件
             EditText etContent = new EditText(this);
             LinearLayout.LayoutParams etParam = new LinearLayout.LayoutParams(
-                    dp2px(this,150), dp2px(this,24)
+                    dp2px(this, 150), dp2px(this, 24)
             );
 //            try {
 ////                Field field = TextView.class.getDeclaredField("mCursorDrawableRes");
@@ -271,9 +277,9 @@ public class GuideRouteActivity extends AppCompatActivity {
 ////            }
             //etContent.setBackgroundResource(R.drawable.edit_register_bg);
             etContent.setLayoutParams(etParam);
-            etContent.setPadding(0,10,0,10);
+            etContent.setPadding(0, 10, 0, 10);
             etContent.setBackground(getResources().getDrawable(R.drawable.edit_register_bg));
-            etParam.setMargins(dp2px(this,20), 0, 0, 0);
+            etParam.setMargins(dp2px(this, 20), 0, 0, 0);
             layout.addView(etContent);
             listEditText.add(etContent);
 

@@ -3,6 +3,7 @@ package com.example.yiyou_newversion.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.yiyou_newversion.R;
 import com.example.yiyou_newversion.bean.Team;
@@ -29,13 +31,12 @@ import java.util.List;
 
 public class GuideHomeFragment extends Fragment {
 
+    private final static int DISPLAY_TEAM = 0;
     //创建队伍按钮
     private Button btn_crtTeam;
     private LinearLayout linearLayout;
     private View view;
     private Data data = new Data();
-
-    private final static int DISPLAY_TEAM = 0;
     private List<Team> teams = new ArrayList<>();
     private Handler handler;
 
@@ -44,10 +45,10 @@ public class GuideHomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        handler = new Handler(){
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                switch (msg.what){
+                switch (msg.what) {
                     case DISPLAY_TEAM:
                         if (teams.size() != 0) {
                             Button btn[] = new Button[teams.size()];
@@ -58,7 +59,7 @@ public class GuideHomeFragment extends Fragment {
                                 btn[i].setText(teams.get(i).getTeamName());
                                 btn[i].setAllCaps(false);
                                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(700, 120);
-                                layoutParams.setMargins(0, Utils.dp2px(getContext(),15), 0, Utils.dp2px(getContext(),15));
+                                layoutParams.setMargins(0, Utils.dp2px(getContext(), 15), 0, Utils.dp2px(getContext(), 15));
                                 linearLayout.addView(btn[i], layoutParams);
                             }
                             for (int j = 0; j < teams.size(); j++) {
@@ -68,12 +69,13 @@ public class GuideHomeFragment extends Fragment {
                                     public void onClick(View v) {
                                         int i = (Integer) v.getTag();
                                         Data.CurrentTeamName = teams.get(i).getTeamName();
+                                        Data.CurrentGuidePhoneNum = teams.get(i).getGuidePhoneNum();
 
                                         //更新功能页面的信息
                                         GuideMainActivity activity = (GuideMainActivity) getActivity();
                                         NoScrollViewPager viewPager = activity.findViewById(R.id.mViewPager);
-                                        GuideFunctionFragment guideFunctionFragment = (GuideFunctionFragment)getActivity().getSupportFragmentManager()
-                                                .findFragmentByTag("android:switcher:"+R.id.mViewPager+":1");
+                                        GuideFunctionFragment guideFunctionFragment = (GuideFunctionFragment) getActivity().getSupportFragmentManager()
+                                                .findFragmentByTag("android:switcher:" + R.id.mViewPager + ":1");
                                         guideFunctionFragment.updateUI();
                                         viewPager.setCurrentItem(1);
                                     }
@@ -98,10 +100,16 @@ public class GuideHomeFragment extends Fragment {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                teams = data.getCurTeamsInGuide();
+                Looper.prepare();
+                try {
+                    teams = data.getCurTeamsInGuide();
 
-                //转至主线程更新UI
-                handler.sendEmptyMessage(DISPLAY_TEAM);
+                    //转至主线程更新UI
+                    handler.sendEmptyMessage(DISPLAY_TEAM);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                }
+                Looper.loop();
             }
         });
         thread.start();

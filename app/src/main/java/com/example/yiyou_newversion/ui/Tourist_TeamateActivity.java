@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -146,12 +147,18 @@ public class Tourist_TeamateActivity extends AppCompatActivity {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //因为队伍里面肯定包含自己，所以teams的大小肯定不等于0
-                teams = data.getCurrentTeam();
-                NoPeopleTeam = data.getNoPeopleTeam();
-                users = data.getCurUsersInfo(teams);
+                Looper.prepare();
+                try {
+                    //因为队伍里面肯定包含自己，所以teams的大小肯定不等于0
+                    teams = data.getCurrentTeam();
+                    NoPeopleTeam = data.getNoPeopleTeam();
+                    users = data.getCurUsersInfo(teams);
 
-                handler.sendEmptyMessage(DISPLAY_TEAMATE);
+                    handler.sendEmptyMessage(DISPLAY_TEAMATE);
+                } catch (Exception e) {
+                    Toast.makeText(Tourist_TeamateActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                }
+                Looper.loop();
             }
         });
         thread.start();
@@ -165,14 +172,6 @@ public class Tourist_TeamateActivity extends AppCompatActivity {
                 finish();
             }
         });
-    }
-
-    private void findAllViews() {
-        teamName = findViewById(R.id.teamName);
-        teamNum = findViewById(R.id.teamNum);
-        teamCode = findViewById(R.id.teamCode);
-        btn_teamCode = findViewById(R.id.btn_teamCode);
-        btn_quit = findViewById(R.id.btn_quit);
     }
 
     private void saveCroppedImage(Bitmap bitmap, String filePath) {
@@ -191,6 +190,14 @@ public class Tourist_TeamateActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(Tourist_TeamateActivity.this, "保存失败！", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void findAllViews() {
+        teamName = findViewById(R.id.teamName);
+        teamNum = findViewById(R.id.teamNum);
+        teamCode = findViewById(R.id.teamCode);
+        btn_teamCode = findViewById(R.id.btn_teamCode);
+        btn_quit = findViewById(R.id.btn_quit);
     }
 
     @Override

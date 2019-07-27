@@ -160,6 +160,7 @@ public class Data {
             while (rs.next()) {
                 Team team = new Team();
                 team.setTeamName(rs.getString("teamName"));
+                team.setGuidePhoneNum(rs.getString("guidePhoneNum"));
                 list.add(team);
             }
         } catch (SQLException ex) {
@@ -321,11 +322,12 @@ public class Data {
         Team team = null;
         PreparedStatement statement = null;
         Connection connection = DBHelper.connect();
-        String sql = "select * from Team where teamName = ?";
+        String sql = "select * from Team where teamName = ? and guidePhoneNum = ?";
 
         try {
             statement = connection.prepareStatement(sql);
             statement.setString(1, Data.CurrentTeamName);
+            statement.setString(2, Data.CurrentGuidePhoneNum);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
                 team = new Team();
@@ -365,13 +367,14 @@ public class Data {
         User user = null;
         PreparedStatement statement = null;
         Connection connection = DBHelper.connect();
-        String sql1 = "select * from Team where teamName = ?";
+        String sql1 = "select * from Team where teamName = ? and guidePhoneNum = ?";
         String sql2 = "select * from User where phoneNum = ?";
 
 
         try {
             statement = connection.prepareStatement(sql1);
             statement.setString(1, Data.CurrentTeamName);
+            statement.setString(2, Data.CurrentGuidePhoneNum);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
                 team = new Team();
@@ -403,12 +406,13 @@ public class Data {
         Connection con = null;
         PreparedStatement stat = null;
         con = DBHelper.connect();
-        String sql = "select * from Team where teamName = ? and teamatePhoneNum != ?";
+        String sql = "select * from Team where teamName = ? and teamatePhoneNum != ? and guidePhoneNum = ?";
 
         try {
             stat = con.prepareStatement(sql);
             stat.setString(1, Data.CurrentTeamName);
             stat.setString(2, "0");
+            stat.setString(3, Data.CurrentGuidePhoneNum);
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
                 Team team = new Team();
@@ -429,12 +433,13 @@ public class Data {
         Connection con = null;
         PreparedStatement stat = null;
         con = DBHelper.connect();
-        String sql = "select * from Team where teamName = ? and teamatePhoneNum = ?";
+        String sql = "select * from Team where teamName = ? and teamatePhoneNum = ? and guidePhoneNum = ?";
 
         try {
             stat = con.prepareStatement(sql);
             stat.setString(1, Data.CurrentTeamName);
             stat.setString(2, "0");
+            stat.setString(3, Data.CurrentGuidePhoneNum);
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
                 Team team = new Team();
@@ -461,14 +466,16 @@ public class Data {
         String sql = "select * from User where phoneNum = ?";
 
         try {
-            stat = con.prepareStatement(sql);
-            stat.setString(1, teams.get(0).getTeamatePhoneNum());
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                user = new User();
-                user.setUsername(rs.getString("username"));
-                user.setPhoneNum(rs.getString("phoneNum"));
-                list.add(user);
+            for (int i = 0; i < teams.size(); i++) {
+                stat = con.prepareStatement(sql);
+                stat.setString(1, teams.get(i).getTeamatePhoneNum());
+                ResultSet rs = stat.executeQuery();
+                while (rs.next()) {
+                    user = new User();
+                    user.setUsername(rs.getString("username"));
+                    user.setPhoneNum(rs.getString("phoneNum"));
+                    list.add(user);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -605,6 +612,32 @@ public class Data {
             e.printStackTrace();
         }
         if (res == 1){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public boolean hasThisTeamName(String teamName) {
+        boolean res = false;
+        Connection conn = null;
+        PreparedStatement stat = null;
+        conn = DBHelper.connect();
+        String sql = "select * from Team where guidePhoneNum = ? and teamName = ? and teamatePhoneNum = ?";
+
+        try {
+            stat = conn.prepareStatement(sql);
+            stat.setString(1, Data.CurrenUserPhoneNum);
+            stat.setString(2, teamName);
+            stat.setString(3, "0");
+            ResultSet rs = stat.executeQuery();
+            if (rs.next()){
+                res = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (res){
             return true;
         }else {
             return false;

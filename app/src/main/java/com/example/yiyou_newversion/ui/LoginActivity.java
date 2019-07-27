@@ -87,21 +87,49 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         @Override
                         public void run() {
                             Looper.prepare();
-                            Data data = new Data();
-                            User user = data.getUserByPhoneNumInLogin(phoneNum);
-                            //先判断手机号存在与否
-                            if (user != null){
-                                //再判断密码是否正确
-                                if (user.getPassword() == password || user.getPassword().equals(password)){
-                                    //接着判断用户的身份，0为游客，1为导游
-                                    if (user.getIdentity() == 0){
-                                        //Toast.makeText(LoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
-                                        Log.i(TAG, "run: loginSuccessful<tourist>");
+                            try {
+                                Data data = new Data();
+                                User user = data.getUserByPhoneNumInLogin(phoneNum);
+                                //先判断手机号存在与否
+                                if (user != null) {
+                                    //再判断密码是否正确
+                                    if (user.getPassword() == password || user.getPassword().equals(password)) {
+                                        //接着判断用户的身份，0为游客，1为导游
+                                        if (user.getIdentity() == 0) {
+                                            //Toast.makeText(LoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
+                                            Log.i(TAG, "run: loginSuccessful<tourist>");
 
-                                        //将登录成功的用户的信息保留下来
-                                        Data.CurrenUserPhoneNum = user.getPhoneNum();
-                                        Data.CurrenUserUsername = user.getUsername();
+                                            //将登录成功的用户的信息保留下来
+                                            Data.CurrenUserPhoneNum = user.getPhoneNum();
+                                            Data.CurrenUserUsername = user.getUsername();
 
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    progressBar.setVisibility(View.GONE);
+                                                }
+                                            });
+
+                                            startActivity(new Intent(LoginActivity.this, TouristMainActivity.class));
+                                            finish();
+                                        } else {
+                                            Log.i(TAG, "run: loginSuccessful<guide>");
+
+                                            //将登录成功的用户的信息保留下来
+                                            Data.CurrenUserPhoneNum = user.getPhoneNum();
+                                            Data.CurrenUserUsername = user.getUsername();
+
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    progressBar.setVisibility(View.GONE);
+                                                }
+                                            });
+
+                                            startActivity(new Intent(LoginActivity.this, GuideMainActivity.class));
+                                            finish();
+                                        }
+                                    } else {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -109,26 +137,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             }
                                         });
 
-                                        startActivity(new Intent(LoginActivity.this,TouristMainActivity.class));
-                                        finish();
-                                    }else {
-                                        Log.i(TAG, "run: loginSuccessful<guide>");
-
-                                        //将登录成功的用户的信息保留下来
-                                        Data.CurrenUserPhoneNum = user.getPhoneNum();
-                                        Data.CurrenUserUsername = user.getUsername();
-
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                progressBar.setVisibility(View.GONE);
-                                            }
-                                        });
-
-                                        startActivity(new Intent(LoginActivity.this, GuideMainActivity.class));
-                                        finish();
+                                        Toast.makeText(LoginActivity.this, "密码错误！", Toast.LENGTH_SHORT).show();
+                                        Log.i(TAG, "run: passwordError");
                                     }
-                                }else {
+                                } else {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -136,19 +148,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         }
                                     });
 
-                                    Toast.makeText(LoginActivity.this, "密码错误！", Toast.LENGTH_SHORT).show();
-                                    Log.i(TAG, "run: passwordError");
+                                    Toast.makeText(LoginActivity.this, "该手机号不存在！", Toast.LENGTH_SHORT).show();
+                                    Log.i(TAG, "run: phoneNumFail");
                                 }
-                            }else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        progressBar.setVisibility(View.GONE);
-                                    }
-                                });
-
-                                Toast.makeText(LoginActivity.this, "该手机号不存在！", Toast.LENGTH_SHORT).show();
-                                Log.i(TAG, "run: phoneNumFail");
+                            }catch (Exception e){
+                                Toast.makeText(LoginActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                             }
                             Looper.loop();
                         }

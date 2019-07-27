@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -41,6 +42,7 @@ import static com.example.yiyou_newversion.utils.Utils.byte2bitmap;
 
 public class FinishCrtTeamActivity extends AppCompatActivity {
 
+    private final static int DISPLAY_INFO = 0;
     private TextView txt_guideName;
     private TextView txt_teamName_teamCode;
     private ImageView QRCode;
@@ -48,16 +50,12 @@ public class FinishCrtTeamActivity extends AppCompatActivity {
     private Button btn_finish;
     private Dialog dialog;
     private ImageView mImageView;
-
     private Data data = new Data();
-
     //CreateTeamActivity传过来的信息的相关变量
     private String TeamName;
     private String TeamCode;
     private byte[] QRByte;
-
     private Handler handler;
-    private final static int DISPLAY_INFO = 0;
     //二维码保存的路径
     private String path;
 
@@ -68,10 +66,10 @@ public class FinishCrtTeamActivity extends AppCompatActivity {
 
         findAllViews();
 
-        handler = new Handler(){
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                switch (msg.what){
+                switch (msg.what) {
                     case DISPLAY_INFO:
                         //拿到CreateTeamActivity传过来的信息
                         Intent intent = getIntent();
@@ -94,6 +92,7 @@ public class FinishCrtTeamActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 Data.CurrentTeamName = "none";
+                                Data.CurrentGuidePhoneNum = "none";
                                 Intent intent = new Intent(FinishCrtTeamActivity.this, GuideMainActivity.class);
                                 startActivity(intent);
                                 finish();
@@ -114,9 +113,9 @@ public class FinishCrtTeamActivity extends AppCompatActivity {
                             public boolean onLongClick(View v) {
                                 // Check if we have write permission
                                 if (ContextCompat.checkSelfPermission(FinishCrtTeamActivity.this,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                                    ActivityCompat.requestPermissions(FinishCrtTeamActivity.this,new String[]{
-                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(FinishCrtTeamActivity.this, new String[]{
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                 }
 
                                 //弹出的“保存图片”的dialog
@@ -147,18 +146,43 @@ public class FinishCrtTeamActivity extends AppCompatActivity {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                User currentUser = data.getCurUserInfo();
-                //判断当前用户是否存在
-                if (currentUser != null) {
-                    guideName = currentUser.getUsername();
-                }else {
-                    guideName = "获取不到";
-                }
+                Looper.prepare();
+                try {
+                    User currentUser = data.getCurUserInfo();
+                    //判断当前用户是否存在
+                    if (currentUser != null) {
+                        guideName = currentUser.getUsername();
+                    } else {
+                        guideName = "获取不到";
+                    }
 
-                handler.sendEmptyMessage(DISPLAY_INFO);
+                    handler.sendEmptyMessage(DISPLAY_INFO);
+                } catch (Exception e) {
+                    Toast.makeText(FinishCrtTeamActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
+                }
+                Looper.loop();
             }
         });
         thread.start();
+    }
+
+    private void findAllViews() {
+        txt_guideName = findViewById(R.id.guideName);
+        txt_teamName_teamCode = findViewById(R.id.teamName_teamCode);
+        QRCode = findViewById(R.id.qrCode);
+        btn_finish = findViewById(R.id.finish);
+    }
+
+    private ImageView getImageView() {
+        ImageView iv = new ImageView(this);
+        //宽高
+        iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        //设置padding
+        iv.setPadding(20, 20, 20, 20);
+        //imageview设置图片
+        iv.setImageBitmap(((BitmapDrawable) QRCode.getDrawable()).getBitmap());
+        return iv;
     }
 
     private void saveCroppedImage(Bitmap bitmap, String filePath) {
@@ -179,43 +203,24 @@ public class FinishCrtTeamActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case 1:
-                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(this, "You denied the permission", Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-    }
-
-    private ImageView getImageView() {
-        ImageView iv = new ImageView(this);
-        //宽高
-        iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-        //设置padding
-        iv.setPadding(20, 20, 20, 20);
-        //imageview设置图片
-        iv.setImageBitmap(((BitmapDrawable) QRCode.getDrawable()).getBitmap());
-        return iv;
-    }
-
-    private void findAllViews() {
-        txt_guideName = findViewById(R.id.guideName);
-        txt_teamName_teamCode = findViewById(R.id.teamName_teamCode);
-        QRCode = findViewById(R.id.qrCode);
-        btn_finish = findViewById(R.id.finish);
-    }
-
     //禁用返回键
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK){
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             return true;
-        }else {
+        } else {
             return super.dispatchKeyEvent(event);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "You denied the permission", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 }

@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -184,13 +185,14 @@ public class Guide_TeamateActivity extends AppCompatActivity {
                         });
                         break;
                     case DELETE_TEAM_SUCCESSFUL:
-                        Toast.makeText(Guide_TeamateActivity.this,"删除成功！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Guide_TeamateActivity.this, "删除成功！", Toast.LENGTH_SHORT).show();
                         Data.CurrentTeamName = "none";
+                        Data.CurrentGuidePhoneNum = "none";
                         Intent intent = new Intent(Guide_TeamateActivity.this, GuideMainActivity.class);
                         startActivity(intent);
                         break;
                     case DELETE_TEAM_FAIL:
-                        Toast.makeText(Guide_TeamateActivity.this,"删除失败！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Guide_TeamateActivity.this, "删除失败！", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -203,16 +205,24 @@ public class Guide_TeamateActivity extends AppCompatActivity {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                teams = data.getCurrentTeam();
-                NoPeopleTeam = data.getNoPeopleTeam();
+                Looper.prepare();
+                try {
+                    teams = data.getCurrentTeam();
+                    NoPeopleTeam = data.getNoPeopleTeam();
 
-                if (teams.size()!=0) {
-                    users = data.getCurUsersInfo(teams);
-                    handler.sendEmptyMessage(DISPLAY_TEAMATE_SUCCESSFUL);
+                    //当前队伍已有成员
+                    if (teams.size() != 0) {
+                        users = data.getCurUsersInfo(teams);
+                        handler.sendEmptyMessage(DISPLAY_TEAMATE_SUCCESSFUL);
+                    }
+                    //当前队伍没有成员
+                    else {
+                        handler.sendEmptyMessage(DISPLAY_TEAMATE_FAIL);
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(Guide_TeamateActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                 }
-                else {
-                    handler.sendEmptyMessage(DISPLAY_TEAMATE_FAIL);
-                }
+                Looper.loop();
             }
         });
         thread.start();
@@ -228,12 +238,18 @@ public class Guide_TeamateActivity extends AppCompatActivity {
                         Thread thread1 = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                boolean result = data.deleteTeamSuccessful();
-                                if (result == true){
-                                    handler.sendEmptyMessage(DELETE_TEAM_SUCCESSFUL);
-                                }else {
-                                    handler.sendEmptyMessage(DELETE_TEAM_FAIL);
+                                Looper.prepare();
+                                try {
+                                    boolean result = data.deleteTeamSuccessful();
+                                    if (result == true) {
+                                        handler.sendEmptyMessage(DELETE_TEAM_SUCCESSFUL);
+                                    } else {
+                                        handler.sendEmptyMessage(DELETE_TEAM_FAIL);
+                                    }
+                                } catch (Exception e) {
+                                    Toast.makeText(Guide_TeamateActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                                 }
+                                Looper.loop();
                             }
                         });
                         thread1.start();

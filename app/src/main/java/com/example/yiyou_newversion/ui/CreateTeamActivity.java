@@ -64,32 +64,42 @@ public class CreateTeamActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Looper.prepare();
-                            TeamCode = createTeamCode();
-                            Bitmap QRBitmap = createQRCode(TeamCode);
+                            try {
+                                TeamCode = createTeamCode();
+                                Bitmap QRBitmap = createQRCode(TeamCode);
 
-                            //如果创建队伍成功
-                            if (data.crtTeamSuccessful(TeamName,TravelTime,TeamIntro,
-                                    TeamCode,"0", Utils.bitmap2byte(QRBitmap))){
-                                Toast.makeText(CreateTeamActivity.this, "创建队伍成功！", Toast.LENGTH_SHORT).show();
+                                //首先检查有没有相同名字的队伍
+                                if(data.hasThisTeamName(TeamName)){
+                                    Toast.makeText(CreateTeamActivity.this, "队名已存在，请换一个哦！", Toast.LENGTH_SHORT).show();
+                                }else {
+                                    //如果创建队伍成功
+                                    if (data.crtTeamSuccessful(TeamName, TravelTime, TeamIntro,
+                                            TeamCode, "0", Utils.bitmap2byte(QRBitmap))) {
+                                        Toast.makeText(CreateTeamActivity.this, "创建队伍成功！", Toast.LENGTH_SHORT).show();
 
-                                //将队伍码，二维码的bitmap，队伍名称放进intent传到FinishCrtTeamActivity
-                                final Intent intent = new Intent(CreateTeamActivity.this, FinishCrtTeamActivity.class);
-                                intent.putExtra("TeamCode", TeamCode);
-                                intent.putExtra("QRBitmap", Utils.bitmap2byte(QRBitmap));
-                                intent.putExtra("TeamName", TeamName);
+                                        //将队伍码，二维码的bitmap，队伍名称放进intent传到FinishCrtTeamActivity
+                                        final Intent intent = new Intent(CreateTeamActivity.this, FinishCrtTeamActivity.class);
+                                        intent.putExtra("TeamCode", TeamCode);
+                                        intent.putExtra("QRBitmap", Utils.bitmap2byte(QRBitmap));
+                                        intent.putExtra("TeamName", TeamName);
 
-                                Timer timer = new Timer();
-                                TimerTask ts = new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        startActivity(intent);
-                                        finish();
+                                        Timer timer = new Timer();
+                                        TimerTask ts = new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        };
+                                        timer.schedule(ts, 1000);
+                                    } else {
+                                        //创建队伍失败则提示
+                                        Toast.makeText(CreateTeamActivity.this, "创建队伍失败，发生未知错误！", Toast.LENGTH_SHORT).show();
                                     }
-                                };
-                                timer.schedule(ts, 1000);
-                            }else {
-                                //创建队伍失败则提示
-                                Toast.makeText(CreateTeamActivity.this, "创建队伍失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                }
+
+                            } catch (Exception e) {
+                                Toast.makeText(CreateTeamActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                             }
                             Looper.loop();
                         }
@@ -118,6 +128,7 @@ public class CreateTeamActivity extends AppCompatActivity {
         //判断随机生成的队伍码在数据库中是否存在
         List<Team> teams = data.findTeamsByTeamCode(TeamCodeByMethod);
         while (teams.size() >= 1) {
+            TeamCodeByMethod = "";
             for (int i = 0; i < 6; i++) {
                 int value = (int) (Math.random() * 26 + 65);
                 TeamCodeByMethod += (char) value;

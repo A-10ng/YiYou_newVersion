@@ -17,7 +17,8 @@ import java.util.Properties;
 public class DBHelper {
     public static Connection connect() {
         String driverClassName = "com.mysql.jdbc.Driver";
-        String url = "jdbc:mysql://120.78.219.119:3306/TeamMaker?useUnicode=true&characterEncoding=utf8";
+        String url = "jdbc:mysql://120.78.219.119:3306/TeamMaker";
+        //String url = "jdbc:mysql://120.78.219.119:3306/TeamMaker?useUnicode=true&characterEncoding=utf8";
 
         try {
             Class.forName(driverClassName);

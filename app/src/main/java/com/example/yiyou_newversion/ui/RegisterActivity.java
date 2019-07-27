@@ -143,64 +143,67 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         @Override
                         public void run() {
                             Looper.prepare();
+                            try {
+                                //当前btn_upload_avatar的内容
+                                BitmapDrawable bitmapDrawable = (BitmapDrawable) btn_upload_avatar.getBackground();
+                                Bitmap current_avatar_bitmap = bitmapDrawable.getBitmap();
 
-                            //当前btn_upload_avatar的内容
-                            BitmapDrawable bitmapDrawable = (BitmapDrawable) btn_upload_avatar.getBackground();
-                            Bitmap current_avatar_bitmap = bitmapDrawable.getBitmap();
+                                //原本btn_upload_avatar的内容，如果当前的内容等于原本的，说明用户没有选择头像，则使用默认的头像
+                                Bitmap upload_avatar_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar_upload);
+                                //默认头像
+                                Bitmap default_avatar_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.default_avatar);
 
-                            //原本btn_upload_avatar的内容，如果当前的内容等于原本的，说明用户没有选择头像，则使用默认的头像
-                            Bitmap upload_avatar_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar_upload);
-                            //默认头像
-                            Bitmap default_avatar_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.default_avatar);
+                                Data data = new Data();
 
-                            Data data = new Data();
-
-                            //先判断是否已经存在该手机号
-                            if (data.hasThisPhoneNum(phoneNum)) {
-                                Toast.makeText(RegisterActivity.this, "您已经注册过该手机号了！", Toast.LENGTH_SHORT).show();
-                            } else {
-                                //用户未选择头像则使用默认头像
-                                if (current_avatar_bitmap.equals(upload_avatar_bitmap)) {
-                                    if (data.isRegisterSuccessful(username,md5(password),company,
-                                            identity,gender,bitmap2byte(default_avatar_bitmap),phoneNum)){
-                                        Toast.makeText(RegisterActivity.this, "注册成功，即将前往登录！", Toast.LENGTH_SHORT).show();
-
-                                        //设置定时任务，一秒后跳至登录界面
-                                        Timer timer = new Timer();
-                                        TimerTask task = new TimerTask() {
-                                            @Override
-                                            public void run() {
-                                                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
-                                                finish();
-                                            }
-                                        };
-                                        timer.schedule(task,1000);
-
-                                    }else {
-                                        Toast.makeText(RegisterActivity.this, "注册失败，发生未知错误！", Toast.LENGTH_SHORT).show();
-                                    }
-
+                                //先判断是否已经存在该手机号
+                                if (data.hasThisPhoneNum(phoneNum)) {
+                                    Toast.makeText(RegisterActivity.this, "您已经注册过该手机号了！", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    //用户选择头像则使用选择的头像
-                                    if (data.isRegisterSuccessful(username,md5(password),company,
-                                            identity,gender,bitmap2byte(current_avatar_bitmap),phoneNum)){
-                                        Toast.makeText(RegisterActivity.this, "注册成功，即将前往登录！", Toast.LENGTH_SHORT).show();
+                                    //用户未选择头像则使用默认头像
+                                    if (current_avatar_bitmap.equals(upload_avatar_bitmap)) {
+                                        if (data.isRegisterSuccessful(username, md5(password), company,
+                                                identity, gender, bitmap2byte(default_avatar_bitmap), phoneNum)) {
+                                            Toast.makeText(RegisterActivity.this, "注册成功，即将前往登录！", Toast.LENGTH_SHORT).show();
 
-                                        //设置定时任务，一秒后跳至登录界面
-                                        Timer timer = new Timer();
-                                        TimerTask task = new TimerTask() {
-                                            @Override
-                                            public void run() {
-                                                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
-                                                finish();
-                                            }
-                                        };
-                                        timer.schedule(task,1000);
+                                            //设置定时任务，一秒后跳至登录界面
+                                            Timer timer = new Timer();
+                                            TimerTask task = new TimerTask() {
+                                                @Override
+                                                public void run() {
+                                                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                                    finish();
+                                                }
+                                            };
+                                            timer.schedule(task, 1000);
 
-                                    }else {
-                                        Toast.makeText(RegisterActivity.this, "注册失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(RegisterActivity.this, "注册失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    } else {
+                                        //用户选择头像则使用选择的头像
+                                        if (data.isRegisterSuccessful(username, md5(password), company,
+                                                identity, gender, bitmap2byte(current_avatar_bitmap), phoneNum)) {
+                                            Toast.makeText(RegisterActivity.this, "注册成功，即将前往登录！", Toast.LENGTH_SHORT).show();
+
+                                            //设置定时任务，一秒后跳至登录界面
+                                            Timer timer = new Timer();
+                                            TimerTask task = new TimerTask() {
+                                                @Override
+                                                public void run() {
+                                                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                                    finish();
+                                                }
+                                            };
+                                            timer.schedule(task, 1000);
+
+                                        } else {
+                                            Toast.makeText(RegisterActivity.this, "注册失败，发生未知错误！", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 }
+                            } catch (Exception e) {
+                                Toast.makeText(RegisterActivity.this, "是不是没网了呀...", Toast.LENGTH_SHORT).show();
                             }
                             Looper.loop();
                         }
